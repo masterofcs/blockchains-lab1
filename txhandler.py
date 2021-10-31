@@ -23,13 +23,15 @@ class TxHandler:
     def isValidTx(self, tx: Transaction) -> bool:
         # IMPLEMENT THIS
         usedUTOX = []
-        sum_input = 0;
+        sum_input = 0
+        sum_output = 0
         for trans_input in tx.numInputs():
             input_data = tx.getInput(trans_input)
             output_index = input_data.outputIndex
             pre_hash = input_data.prevTxHash
             signature = input_data.signature
             utxo_verify = utxo.UTXO(pre_hash, output_index)
+            output_data = tx.getOutput()
             """
             (1) all outputs claimed by {@code tx} are in the current UTXO pool, 
             """
@@ -38,17 +40,20 @@ class TxHandler:
             """
             Valid all signature
             """
-            if not Crypto.verifySignature(tx.getOutput().address, tx.getRawDataToSign(output_index), signature):
+            if not Crypto.verifySignature(output_data.address, tx.getRawDataToSign(output_index), signature):
                 return False
             """no UTXO is claimed multiple times by {@code tx}"""
             if usedUTOX.__contains__(utxo_verify):
                 return False
             usedUTOX.append(utxo_verify)
-            sum_input
+            sum_input+=output_data.value
         for trans_output in tx.numOutputs():
             output_data = tx.getOutput(trans_output)
             if output_data.value < 0:
                 return False
+            sum_output += output_data.value
+        if sum_input < sum_output:
+            return False
         return True
 
 
