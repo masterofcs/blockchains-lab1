@@ -26,34 +26,39 @@ class TxHandler:
         usedUTOX = []
         sum_input = 0
         sum_output = 0
-        for trans_input in tx.numInputs():
+        for trans_input in range(0, tx.numInputs()):
             input_data = tx.getInput(trans_input)
             output_index = input_data.outputIndex
             pre_hash = input_data.prevTxHash
             signature = input_data.signature
             utxo_verify = utxo.UTXO(pre_hash, output_index)
-            output_data = tx.getOutput()
+            output_data = tx.getOutput(output_index)
             """
             (1) all outputs claimed by {@code tx} are in the current UTXO pool, 
             """
             if not self.__pool.contains(utxo_verify):
+                print("Transaction not int pool")
                 return False
             """
             Valid all signature
             """
             if not Crypto.verifySignature(output_data.address, tx.getRawDataToSign(output_index), signature):
+                print("Transaction not verify")
                 return False
             """no UTXO is claimed multiple times by {@code tx}"""
             if usedUTOX.__contains__(utxo_verify):
+                print("Transaction is exists")
                 return False
             usedUTOX.append(utxo_verify)
             sum_input+=output_data.value
-        for trans_output in tx.numOutputs():
+        for trans_output in range(0, tx.numOutputs()):
             output_data = tx.getOutput(trans_output)
             if output_data.value < 0:
+                print("Transaction has negative value")
                 return False
             sum_output += output_data.value
         if sum_input < sum_output:
+            print("Transaction output is larger than input")
             return False
         return True
 
@@ -63,7 +68,7 @@ class TxHandler:
     transaction for correctness, returning a mutually valid array of accepted transactions, and
     updating the current UTXO pool as appropriate.
     """
-    def handleTxs(self, txs):
+    def handleTxs(self, txs: [Transaction]):
         # IMPLEMENT THIS
         validTx = []
         for tx in txs:
@@ -76,7 +81,7 @@ class TxHandler:
                     utxo = UTXO(outputIndex, prevTxHash)
                     self.__pool.removeUTXO(utxo)
                 # add new utxo
-                hash = tx.__hash__
+                hash = tx.hash
                 for i in range(0, tx.numOutputs):
                     utxo = UTXO(hash, i)
                     self.__pool.addUTXO(utxo, tx.getOutput(i))
