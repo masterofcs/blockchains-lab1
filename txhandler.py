@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 import utxo
 from utxo import UTXOPool
 from transaction import Transaction
 from crypto import Crypto
+=======
+from utxo import UTXOPool
+from transaction import Transaction
+>>>>>>> 437521cfa2ed6be12f94b2f47294b02b07c0cf52
 
 class TxHandler:
     """
@@ -9,7 +14,11 @@ class TxHandler:
     """
     def __init__(self, pool: UTXOPool):
         # IMPLEMENT THIS
+<<<<<<< HEAD
         self.__pool = pool
+=======
+        return
+>>>>>>> 437521cfa2ed6be12f94b2f47294b02b07c0cf52
 
     """
     @return true if:
@@ -49,9 +58,7 @@ class TxHandler:
             output_data = tx.getOutput(trans_output)
             if output_data.value < 0:
                 return False
-
-
-        return 
+        return True
 
 
     """
@@ -61,7 +68,11 @@ class TxHandler:
     """
     def handleTxs(self, txs):
         # IMPLEMENT THIS
+<<<<<<< HEAD
         for tx in txs:
             if self.isValidTx(tx):
                 self.__pool.getTxOutput(tx)
         return False
+=======
+        return 
+>>>>>>> 437521cfa2ed6be12f94b2f47294b02b07c0cf52
