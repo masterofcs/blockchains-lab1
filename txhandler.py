@@ -1,5 +1,6 @@
 import utxo
 from utxo import UTXOPool
+from utxo import UTXO
 from transaction import Transaction
 from crypto import Crypto
 
@@ -64,7 +65,19 @@ class TxHandler:
     """
     def handleTxs(self, txs):
         # IMPLEMENT THIS
+        validTx = []
         for tx in txs:
             if self.isValidTx(tx):
-                self.__pool.getTxOutput(tx)
-        return False
+                validTx.append(tx)
+                # remove utxo
+                for input in tx.getInput:
+                    outputIndex = input.outputIndex
+                    prevTxHash = input.prevTxHash
+                    utxo = UTXO(outputIndex, prevTxHash)
+                    self.__pool.removeUTXO(utxo)
+                # add new utxo
+                hash = tx.__hash__
+                for i in range(0, tx.numOutputs):
+                    utxo = UTXO(hash, i)
+                    self.__pool.addUTXO(utxo, tx.getOutput(i))
+        return validTx
