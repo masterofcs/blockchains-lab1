@@ -1,5 +1,7 @@
+import utxo
 from utxo import UTXOPool
 from transaction import Transaction
+from crypto import Crypto
 
 class TxHandler:
     """
@@ -8,7 +10,6 @@ class TxHandler:
     def __init__(self, pool: UTXOPool):
         # IMPLEMENT THIS
         self.__pool = pool
-        return
 
     """
     @return true if:
@@ -21,6 +22,34 @@ class TxHandler:
     """
     def isValidTx(self, tx: Transaction) -> bool:
         # IMPLEMENT THIS
+        usedUTOX = []
+        sum_input = 0;
+        for trans_input in tx.numInputs():
+            input_data = tx.getInput(trans_input)
+            output_index = input_data.outputIndex
+            pre_hash = input_data.prevTxHash
+            signature = input_data.signature
+            utxo_verify = utxo.UTXO(pre_hash, output_index)
+            """
+            (1) all outputs claimed by {@code tx} are in the current UTXO pool, 
+            """
+            if not self.__pool.contains(utxo_verify):
+                return False
+            """
+            Valid all signature
+            """
+            if not Crypto.verifySignature(tx.getOutput().address, tx.getRawDataToSign(output_index), signature):
+                return False
+            """no UTXO is claimed multiple times by {@code tx}"""
+            if usedUTOX.__contains__(utxo_verify):
+                return False
+            usedUTOX.append(utxo_verify)
+            sum_input
+        for trans_output in tx.numOutputs():
+            output_data = tx.getOutput(trans_output)
+            if output_data.value < 0:
+                return False
+
 
         return 
 
