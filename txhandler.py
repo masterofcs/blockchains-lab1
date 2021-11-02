@@ -27,12 +27,13 @@ class TxHandler:
         sum_input = 0
         sum_output = 0
         for trans_input in range(0, tx.numInputs()):
+            print("validate transaction: ", trans_input)
             input_data = tx.getInput(trans_input)
             output_index = input_data.outputIndex
             pre_hash = input_data.prevTxHash
             signature = input_data.signature
             utxo_verify = utxo.UTXO(pre_hash, output_index)
-            output_data = tx.getOutput(output_index)
+            output_data = self.__pool.getTxOutput(utxo_verify)
             """
             (1) all outputs claimed by {@code tx} are in the current UTXO pool, 
             """
@@ -42,7 +43,7 @@ class TxHandler:
             """
             Valid all signature
             """
-            if not Crypto.verifySignature(output_data.address, tx.getRawDataToSign(output_index), signature):
+            if not Crypto.verifySignature(output_data.address, tx.getRawDataToSign(trans_input), signature):
                 print("Transaction not verify")
                 return False
             """no UTXO is claimed multiple times by {@code tx}"""
@@ -50,6 +51,7 @@ class TxHandler:
                 print("Transaction is exists")
                 return False
             usedUTOX.append(utxo_verify)
+            print(f'Value of transaction input {trans_input} value {output_data.value} ')
             sum_input+=output_data.value
         for trans_output in range(0, tx.numOutputs()):
             output_data = tx.getOutput(trans_output)
@@ -57,6 +59,7 @@ class TxHandler:
                 print("Transaction has negative value")
                 return False
             sum_output += output_data.value
+            print(f'Value of transaction output {trans_output} value {output_data.value} ')
         if sum_input < sum_output:
             print("Transaction output is larger than input")
             return False

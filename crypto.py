@@ -14,9 +14,11 @@ class Crypto:
     @staticmethod
     def verifySignature(pubkey: RSA.RsaKey, message: bytes, signature: bytes):
         h = SHA256.new(message)
+        print(f'Verify: {pubkey} with {message} and {signature}')
         verifier = pkcs1_15.new(pubkey)
         try:
             verifier.verify(h, signature)
             return True
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
+            print(e)
             return False
