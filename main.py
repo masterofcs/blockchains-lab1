@@ -33,14 +33,18 @@ def init():
     hieu_public = hieu_address.public_key()
     print(f'Hieu pub {hieu_public}')
     tx2.addInput(tx.hash, 0)
-    tx2.addOutput(10, hieu_public)
-    tx2.addOutput(90, hieu_address.public_key())
-    tx2.addOutput(20, hieu_address.public_key())
+    tx2.addOutput(1, hieu_public)
+    tx2.addOutput(5, hieu_address.public_key())
+    tx2.addOutput(5, hieu_address.public_key())
     # utxo_pool.addUTXO(utxo.UTXO(tx2), tx.getOutput(0))
     # utxo_pool.addUTXO(utxo_init, tx.getOutput(0))
     tx2.addSignature(sign(tx2.getRawDataToSign(0), hau_pri), 0)
     tx2.finalize()
     tx_handler = txhandler.TxHandler(utxo_pool)
+    print(tx_handler.isValidTx(tx2))
+
+    tx2.addOutput(90, hieu_public)
+    tx2.addSignature(sign(tx2.getRawDataToSign(0), hau_pri), 0)
     print(tx_handler.isValidTx(tx2))
 
 
